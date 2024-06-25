@@ -10,6 +10,7 @@ import logging
 import os
 import warnings
 from utils.image_processing import UndertonePredictor
+import utils.match_recommend
 
 
 # f the warnings (sorry :( )
@@ -40,7 +41,7 @@ async def predict(file: UploadFile = File(...)):
 
         try:
             # Perform predictions using the saved image path
-            undertone = model.predict_undertone(img_path)
+            undertone = model.predict_undertone(img_path) # warm, cool, neutral 
             tone_palette = ['#533023', '#6C4131', '#A36F48', '#BF8861', '#ECD0BA', '#F8E5D6']
             tone_labels = ['deep', 'medium-deep', 'medium', 'light-medium', 'light', 'fair']
             tone = model.predict_tone(img_path, tone_palette, tone_labels)
@@ -49,9 +50,14 @@ async def predict(file: UploadFile = File(...)):
             os.remove(img_path)
             img.close()
         
+        recommendations = utils.match_recommend.get_recommendation(undertone["undertone"], tone["tone_label"])
+        if recommendations is None:
+            raise HTTPException(status_code=404, detail="No matching product found")
+        
         response = {
             'undertone': undertone,
-            'tone': tone
+            'tone': tone,
+            'recommendations': recommendations
         }
         print("Returning response:\n", response)
         return JSONResponse(content=response)
