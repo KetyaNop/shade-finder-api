@@ -22,6 +22,10 @@ app = FastAPI()
 # Initialize the model with the path to the pretrained model
 model = UndertonePredictor('models/skin_tone_classifier.pkl')
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...)):
     try:
