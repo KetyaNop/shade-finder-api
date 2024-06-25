@@ -60,7 +60,7 @@ async def predict(file: UploadFile = File(...)):
             'recommendations': recommendations
         }
         print("Returning response:\n", response)
-        return JSONResponse(content=response)
+        return JSONResponse(content=response, status_code=200)
     
     except Exception as e:
         print("error:", e)
