@@ -1,6 +1,7 @@
 import sys
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 import io
 import base64
@@ -12,13 +13,16 @@ import warnings
 from utils.image_processing import UndertonePredictor
 import utils.match_recommend
 
-
-# f the warnings (sorry :( )
-warnings.filterwarnings("ignore", category=DeprecationWarning, module='google._upb._message')
-warnings.filterwarnings("ignore", category=DeprecationWarning, module='fdlite.iris_landmark')
-warnings.filterwarnings("ignore", category=UserWarning, module='sklearn.base')
-
 app = FastAPI()
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"], 
+    allow_headers=["*"],  
+)
 
 # Initialize the model with the path to the pretrained model
 model = UndertonePredictor('models/skin_tone_classifier.pkl')
